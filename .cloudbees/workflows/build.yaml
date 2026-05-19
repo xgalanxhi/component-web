@@ -1,0 +1,57 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: build
+
+on:
+  workflow_call:
+    outputs:
+      artifact-id:
+        value: ${{ jobs.build.outputs.artifact-id }}
+      version:
+        value: ${{ jobs.build.outputs.version }}
+      image:
+        value: ${{ jobs.build.outputs.image }}
+
+jobs:
+  build:
+    outputs:
+      artifact-id: web-artifact-${{ cloudbees.version }}
+      version: ${{ cloudbees.version }}
+      image: docker.io/mock/web:${{ cloudbees.version }}
+    steps:
+      - name: Check out
+        id: checkout
+        uses: cloudbees-io/checkout@v2
+
+      - name: Mock Build Web Component
+        uses: docker://alpine:latest
+        shell: sh
+        run: |
+          echo "=================================="
+          echo "Building Web Component"
+          echo "=================================="
+          echo ""
+          echo "Step 1: Checking out code..."
+          echo "Step 2: Installing npm dependencies..."
+          echo "Step 3: Running frontend build..."
+          echo "Step 4: Building web container..."
+          echo ""
+          echo "✓ Build completed successfully!"
+          echo ""
+          echo "Artifact URL: docker.io/mock/web:${{ cloudbees.version }}"
+          echo "Artifact ID: web-artifact-${{ cloudbees.version }}"
+          echo "Version: ${{ cloudbees.version }}"
+          echo "=================================="
+
+      - name: Publish build evidence
+        uses: cloudbees-io/publish-evidence-item@v1
+        with:
+          content: |
+            ## Web Component Build
+
+            **Component**: Web Application
+            **Image**: `docker.io/mock/web:${{ cloudbees.version }}`
+            **Version**: `${{ cloudbees.version }}`
+            **Artifact ID**: `web-artifact-${{ cloudbees.version }}`
+            **Status**: Build successful
+            **Commit SHA**: `${{ cloudbees.scm.sha }}`
