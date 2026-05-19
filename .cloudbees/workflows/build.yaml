@@ -47,6 +47,8 @@ jobs:
       - name: Register build artifact
         uses: cloudbees-io/register-build-artifact@v1
         with:
+          name: docker.io/mock/web
+          version: ${{ cloudbees.version }}
           artifact-location: docker.io/mock/web:${{ cloudbees.version }}
 
       - name: Publish build evidence
